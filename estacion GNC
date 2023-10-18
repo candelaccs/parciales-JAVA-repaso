@@ -1,0 +1,248 @@
+
+clase VENTA
+
+public class Venta {
+    private int DNI;
+    private double m3;
+    private double monto;
+    private String metodoPago;
+
+    public Venta(int unDNI, double metros3, double unMonto, String unMetodoPago) {
+        this.DNI = unDNI;
+        this.m3 = metros3;
+        this.monto = unMonto;
+        this.metodoPago = unMetodoPago;
+    }
+
+    public int getDNI() {
+        return DNI;
+    }
+
+    public void setDNI(int DNI) {
+        this.DNI = DNI;
+    }
+
+    public double getM3() {
+        return m3;
+    }
+
+    public void setM3(double m3) {
+        this.m3 = m3;
+    }
+
+    public double getMonto() {
+        return monto;
+    }
+
+    public void setMonto(double monto) {
+        this.monto = monto;
+    }
+
+    public String getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
+    }
+
+    @Override
+    public String toString() {
+        return "DNI=" + DNI + ", m3=" + m3 + ", monto=" + monto + ", metodoPago=" + metodoPago;
+    }
+    
+    
+    
+}
+
+clase SURTIDOR
+
+public class Surtidor {
+    private boolean estado;
+    private int dimF;
+    private int dimL;
+    private Venta [] infoVentas;
+
+    public Surtidor(int V) {
+        this.estado = true;
+        this.dimF = V;
+        this.dimL = 0;
+        this.infoVentas = new Venta[dimF];
+    }
+
+    public boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }
+    
+    public void AgregarVenta(Venta unaVenta){
+        infoVentas[dimL] = unaVenta;
+        dimL ++;
+    }
+    
+    public double CalcularM3(){
+        double m3 = 0;
+        for(int i=0; i<dimL; i++)
+            m3 += infoVentas[i].getM3();
+        return m3;
+    }
+    
+    public Venta CalcularVentas(){
+        double max = 0;
+        Venta maxVenta = null;
+        for(int i=0; i<dimL; i++)
+            if(infoVentas[i].getMonto() > max){
+                maxVenta = infoVentas[i];
+                max = infoVentas[i].getMonto();
+            }
+        return maxVenta;
+    }
+
+                
+    
+    
+    @Override
+    public String toString() {
+        String aux = "Estado=" + estado + " ; Ventas: " + "\n";
+        for(int i=0; i<dimL ;i++)
+            aux += "Venta numero " + i+1 +  infoVentas[i].toString() + "\n";
+        
+        return aux;
+    }
+    
+    
+    
+}
+
+clase ESTACION
+
+public class Estacion {
+    private String direccion;
+    private double preciom3;
+    private Surtidor [] surtidores;
+
+    public Estacion(String direccion, double preciom3, int V) {
+        this.direccion = direccion;
+        this.preciom3 = preciom3;
+        this.surtidores = new Surtidor[2]; // Aca solo cree un vector para 6 objetos de tipo surtidor
+        for(int i=0; i<2; i++)
+            surtidores[i] = new Surtidor(V); // Creo cada surtidor con un maximo de ventas. // se estaria hablando al CONSTRUCTOR //
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public double getPreciom3() {
+        return preciom3;
+    }
+
+    public void setPreciom3(double preciom3) {
+        this.preciom3 = preciom3;
+    }
+
+    public Surtidor[] getSurtidores() {
+        return surtidores;
+    }
+
+    public void setSurtidores(Surtidor[] surtidores) {
+        this.surtidores = surtidores;
+    }
+    
+    
+    
+    public void AgregarVenta(int N, Venta unaVenta){
+        // Como no me lo pide el ejercicio no pregunto el estado del surtidor.
+        surtidores[N].AgregarVenta(unaVenta);
+    }
+    
+    public void MarcarFueraServicio(int X){
+        double totalm3;
+        for(int i=0; i<2; i++){
+               totalm3 = surtidores[i].CalcularM3();
+               if(totalm3 < X)
+                   surtidores[i].setEstado(false);
+        }
+    }
+    
+    public Venta CalcularMayorVenta (){
+        Venta maximaVenta, maximaVentaSig = null;
+        for(int i=0; i<2; i++){
+            maximaVenta = surtidores[i].CalcularVentas();
+            if(maximaVentaSig == null)
+                maximaVentaSig = maximaVenta;
+            else{
+                if(maximaVentaSig.getMonto() < maximaVenta.getMonto())
+                    maximaVentaSig = maximaVenta;
+            }
+        }
+        return maximaVentaSig;
+    }
+    
+    
+    @Override
+    public String toString() {
+        
+        String aux = " Estacion de servicio: " + direccion + ", preciom3=" + preciom3 + " \n";
+        
+        for(int i=0; i<2; i++){
+            aux += "Surtidor " + i + surtidores[i].toString();
+        }
+        
+        return aux;
+    }
+    
+    
+    
+}
+
+
+MAIN class
+
+import PaqueteLectura.Lector;
+
+public class Ejercicio2Repaso {
+
+    public static void main(String[] args) {
+        
+        
+        Estacion estacion = new Estacion("Avellaneda 123", 250, 1);
+        
+        int DNI = Lector.leerInt();
+        double m3 = Lector.leerDouble();
+        double monto = m3*estacion.getPreciom3();
+        String metodoPago = "Efectivo";
+        
+        Venta ventas = new Venta(DNI, m3, monto, metodoPago);
+        
+        estacion.AgregarVenta(0, ventas); // agrego una venta al surtidor 2
+        
+        //
+        
+        int DNI2 = Lector.leerInt();
+        double me3 = Lector.leerDouble();
+        double monto2 = me3*estacion.getPreciom3();
+        String metodoPago2 = "Efectivo";
+        
+        Venta ventas2 = new Venta(DNI2, me3, monto2, metodoPago2);
+        
+        estacion.AgregarVenta(1, ventas2); // agrego una venta al surtidor 2
+        
+        //
+        estacion.MarcarFueraServicio(15);
+        
+        System.out.println(estacion.toString());
+        
+
+        Venta maxVenta = estacion.CalcularMayorVenta();
+        System.out.println("La maxima venta es " + maxVenta.toString());
+    }
+    
+}
