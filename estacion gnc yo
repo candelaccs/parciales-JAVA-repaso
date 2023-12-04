@@ -1,0 +1,264 @@
+venta 
+
+package estaciongnc;
+
+/**
+ *
+ * @author cande
+ */
+public class Venta {
+    
+    private int dni;
+    private int litros;
+    private double monto;
+    private String medio;
+    
+    public Venta (int d, int l, double m, String mm){
+        
+        setDni (d);
+        setLitros (l);
+        setMonto (m);
+        setMedio (mm);
+    }
+
+    private void setDni(int dni) {
+        this.dni = dni;
+    }
+
+    private void setLitros(int litros) {
+        this.litros = litros;
+    }
+
+    private void setMonto(double monto) {
+        this.monto = monto;
+    }
+
+    private void setMedio(String medio) {
+        this.medio = medio;
+    }
+
+    public int getDni() {
+        return dni;
+    }
+
+    public int getLitros() {
+        return litros;
+    }
+
+    public double getMonto() {
+        return monto;
+    }
+
+    public String getMedio() {
+        return medio;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + "dni: " + dni + ", litros: " + litros + ", monto: " + monto + ", medio: " + medio + " ] ";
+    }
+    
+    
+    
+}
+
+SURTIDOR
+
+
+package estaciongnc;
+
+/**
+ *
+ * @author cande
+ */
+public class Surtidor {
+    
+    private boolean servicio=true;
+    private Venta vectorV [];
+    private int dimF;
+    private int dimL =0;
+    public Surtidor (int v){
+  
+        setDimF (v);
+        this.vectorV = new Venta [v];
+    }
+
+    private void setDimF(int dimF) {
+        this.dimF = dimF;
+    }
+
+    private int getDimF() {
+        return dimF;
+    }
+
+    public int getDimL() {
+        return dimL;
+    }
+
+ 
+    public void setServicio(boolean servicio) {
+        this.servicio = servicio;
+    }
+
+    public boolean isServicio() {
+        return servicio;
+    }
+     
+    
+    public void agregarVenta (int dni, int m3, String pago, double m){
+        
+        this.vectorV [dimL] = new Venta (dni, m3, m, pago);
+        dimL++;
+    }
+    
+    public int totalm3 (){
+        
+        int tot=0;
+        for (int i=0; i<getDimL(); i++){
+            tot= tot + this.vectorV [i].getLitros();
+        }
+        
+        return tot;
+    }
+    
+    public double maxM (){
+        
+        double max= -1;
+        
+        for (int i=0; i<getDimL(); i++){
+            if (this.vectorV[i].getMonto() > max){
+                max = this.vectorV[i].getMonto();
+            }
+        }
+        
+        return max;
+    }
+    
+    public String info (){
+        
+        String aux;
+        
+        if (isServicio() == false){
+            aux = " fuera de servicio ";
+        }    
+        else {
+          aux = " en servicio ";
+        }
+        
+        for (int i=0; i<getDimL(); i++){
+            
+           aux = aux + this.vectorV[i].toString() + "\n";
+        }
+        return aux;
+    }
+    
+}
+
+ESTACION 
+
+package estaciongnc;
+
+/**
+ *
+ * @author cande
+ */
+public class Estacion {
+    
+    private String dire;
+    private double precio;
+    private Surtidor surtidor [];
+    
+    public Estacion (String d, double p, int v){
+        
+        setDire (d);
+        setPrecio (p);
+        this.surtidor = new Surtidor [5]; // 0 a 5 = 6 //
+        for (int i=0; i<5; i++){
+            this.surtidor[i] = new Surtidor (v);
+        }
+        
+    }
+
+    private void setDire(String dire) {
+        this.dire = dire;
+    }
+
+    private void setPrecio(double precio) {
+        this.precio = precio;
+    }
+    
+    public void agregarVenta (int j, int dni, int m3, String pago, double m){
+        
+        this.surtidor[j].agregarVenta(dni, m3, pago, m);
+    }
+    
+    public void fueraServicio (int x){
+        
+        int totM3;
+        
+        for (int i=0; i<6; i++){
+            totM3 = this.surtidor[i].totalm3();
+            if (totM3 < x){
+                this.surtidor[i].setServicio(false);
+            }
+        }
+    }
+
+    public double mayorMonto (){
+        
+        double t;
+        double max = -1;
+        
+        for (int i=0; i<5; i++){
+            t = this.surtidor[i].maxM();
+            if (t > max)
+                max = t;
+        }
+        
+        return max;
+    }
+    
+    public String informacion (){
+        
+        String aux = " informacion " + "\n" ;
+        
+        for (int i=0; i<5; i++){
+            aux = aux + " surtidor " + i + "\n" + this.surtidor[i].info();
+        }
+        
+        return aux;
+    }
+}
+
+
+MAIN
+
+package estaciongnc;
+
+/**
+ *
+ * @author cande
+ */
+public class EstacionGNC {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        
+        Estacion est = new Estacion (" 13 y 71 ", 100, 4);
+        
+        est.agregarVenta(0, 444, 12, " debito ", 123);
+        est.agregarVenta(1, 478, 33, " efectivo ", 46);
+        est.agregarVenta(1, 462, 2, " credito ", 533);
+        est.agregarVenta(2, 563, 45, " mercado pago ", 566);
+        est.agregarVenta(2, 8952, 666, " cuenta dni ", 656);
+        est.agregarVenta(3, 2565, 32, " efectivo ", 5656);
+        
+        System.out.println(est.mayorMonto());
+        
+        System.out.println (est.informacion());
+    }
+    
+}
+
